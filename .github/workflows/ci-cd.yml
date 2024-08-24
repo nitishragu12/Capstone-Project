@@ -1,0 +1,35 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - feature/CICD-setup # For testing
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build with Docker Compose
+        run: |
+          docker-compose -f docker-compose.dev.yml build
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run tests with Docker Compose
+        run: |
+          docker-compose -f docker-compose.dev.yml up -d
+          docker-compose -f docker-compose.dev.yml exec -T frontend npm test
+          docker-compose -f docker-compose.dev.yml exec -T backend pytest
+          docker-compose -f docker-compose.dev.yml down

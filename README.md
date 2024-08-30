@@ -69,7 +69,7 @@ After getting the files, create a folder named `secrets/` under root folder:
 ```
 
 ### 2. Create `.env.local`
-Generate an `.en.local` file uder `ui/` that specify the url for api app:
+Generate an `.env.local` file uder `ui/` that specify the url for api app:
 ```
 NEXT_PUBLIC_API_URL=http://127.0.0.1:5001
 ```

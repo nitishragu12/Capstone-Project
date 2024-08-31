@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid';
-import { Paper } from '@mui/material';
-
+import { Paper, Switch } from '@mui/material';
 
 interface Result {
   title: string;

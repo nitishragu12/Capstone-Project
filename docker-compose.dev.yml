@@ -7,9 +7,9 @@ services:
       - "5001:5000"
     environment:
       - FLASK_ENV=development
-      - LLM_API_KEY=${LLM_API_KEY:-default_value}
-      - ELS_API_KEY=${ELS_API_KEY:-default_value}
-      - ELS_TOKEN=${ELS_TOKEN:-default_value}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - ELS_API_KEY=${ELS_API_KEY}
+      - ELS_TOKEN=${ELS_TOKEN}
     secrets:
       - llm_api_key
       - els_api_key

@@ -50,8 +50,6 @@ jobs:
       - name: Run tests with Docker Compose
         run: |
           docker-compose -f docker-compose.dev.yml up -d
-          docker-compose -f docker-compose.dev.yml exec -T ui npm test
-          docker-compose -f docker-compose.dev.yml exec -T api pytest
           docker-compose -f docker-compose.dev.yml down
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}

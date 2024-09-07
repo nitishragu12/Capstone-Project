@@ -106,11 +106,10 @@ class PaperSearch(Resource):
     def get(self):
         '''Search papers based on query parameters'''
         # Extract query parameters
-        # @TODO: Conform to UI specification
         query = request.args.get('query', app.config['DEFAULT_QUERY'])
         title = request.args.get('title', None)
         author = request.args.get('author', None)
-        keyword = request.args.get('keyword', None)
+        publications = request.args.get('publications', None)
         from_date = request.args.get('fromDate', None)
         to_date = request.args.get('toDate', None)
         
@@ -119,7 +118,7 @@ class PaperSearch(Resource):
             'query': query,
             'title': title,
             'author': author,
-            'keyword': keyword,
+            'publications': publications,
             'fromDate': from_date,
             'toDate': to_date
         }

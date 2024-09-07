@@ -42,32 +42,13 @@ class ElsevierService:
         ElsevierService.set_api_key()
         ElsevierService.delete_papers()
 
-        if app.config['TESTING']:
-            with open('sample.json', encoding='utf-8') as f:
-                papers_json = json.load(f)
-            papers = [Paper(**{
-                'publication': paper['publication'],
-                'doi': paper['doi'],
-                'title': paper['title'],
-                'author': paper['author'],
-                'publish_date': datetime.strptime(paper['publish_date'], '%Y-%m-%d').date(),
-                'abstract': paper['abstract'],
-                'url': paper['url']
-            }) for paper in papers_json]
-            db.session.add_all(papers)
-            db.session.commit()
-            return papers
-
         params.setdefault('start', 0)
-        params['query'] = params.get('query', app.config['DEFAULT_QUERY'])
+        params['query'] = params.get('query')
         if not params['query']:
             raise ValueError('Missing query parameter for Elsevier.')
+        query = ElsevierService.build_query(params) 
 
-        for date_key in ['fromDate', 'toDate']:
-            if params.get(date_key) and isinstance(params[date_key], str):
-                params[date_key] = datetime.strptime(params[date_key], '%d-%m-%Y').date()
-
-        scopus_url = f"https://api.elsevier.com/content/search/scopus?query={ElsevierService.build_query(params)}&count=5&start={params['start']}"
+        scopus_url = f"https://api.elsevier.com/content/search/scopus?query={query}&count=5&start={params['start']}"
         scopus_res = requests.get(scopus_url, headers=ElsevierService.headers)
         if scopus_res.status_code != 200:
             raise ValueError(f'Error fetching papers from Elsevier (Scopus: {scopus_res.status_code})')
@@ -81,14 +62,45 @@ class ElsevierService:
     @staticmethod
     def build_query(params):
         """Build query string from parameters."""
+
+        for date_key in ['fromDate', 'toDate']:
+            if params.get(date_key) and isinstance(params[date_key], str):
+                params[date_key] = datetime.strptime(params[date_key], '%d-%m-%Y').date()
+
         query_parts = [f"{field}({value})" for field, value in {
             'TITLE-ABS-KEY': params.get('query'),
             'TITLE': params.get('title'),
             'AUTHOR-NAME': params.get('author'),
-            'SRCTITLE': params.get('publication'),
-            'KEY': params.get('keyword')
         }.items() if value]
+
+        if params.get('publications'):
+            sources = ' or '.join([f'"{source}"' for source in params['publications'].split(',')])
+            query_parts.append(f"SRCTITLE({sources})")
+
+        if params.get('fromDate') and params.get('toDate'):
+            fromDate = params['fromDate']
+            toDate = params['toDate']
+            # Get all months between the two dates, e.g. "PUBDATETXT('January 2021' or 'February 2021' or 'March 2021')"
+            months = ElsevierService.months_in_range(fromDate, toDate)
+            query_parts.append(f"PUBDATETXT({ ' or '.join(months) })")
+            
+        print(query_parts)
         return ' AND '.join(query_parts)
+    
+    @staticmethod
+    def months_in_range(from_date, to_date):
+        """Get all months between two dates."""
+        months = []
+        current_year = from_date.year
+        current_month = from_date.month
+        while current_year < to_date.year or (current_year == to_date.year and current_month <= to_date.month):
+            month_str = '"' + datetime(current_year, current_month, 1).strftime('%B %Y') + '"'
+            months.append(month_str)
+            current_month += 1
+            if current_month > 12:
+                current_month = 1
+                current_year += 1
+        return months
 
     @staticmethod
     def transform_entries(response, params):
@@ -104,10 +116,6 @@ class ElsevierService:
                 abstract=ElsevierService.get_abstract(entry.get('prism:doi')) if entry.get('prism:doi') else "No Abstract.",
                 url=f"https://doi.org/{entry.get('prism:doi')}" if entry.get('prism:doi') else None
             )
-            if params.get('fromDate') and paper.publish_date < params['fromDate']:
-                continue
-            if params.get('toDate') and paper.publish_date > params['toDate']:
-                continue
             papers.append(paper)
         return papers
 
@@ -131,11 +139,13 @@ class ElsevierService:
     def get_total_count(params: dict) -> int:
         """Fetch total count of papers from Elsevier API based on query parameters."""
         ElsevierService.set_api_key()
-        params['query'] = params.get('query', app.config['DEFAULT_QUERY'])
+        params.setdefault('start', 0)
+        params['query'] = params.get('query')
         if not params['query']:
             raise ValueError('Missing query parameter for Elsevier.')
+        query = ElsevierService.build_query(params)
 
-        scopus_url = f"https://api.elsevier.com/content/search/scopus?query={ElsevierService.build_query(params)}&count=0"
+        scopus_url = f"https://api.elsevier.com/content/search/scopus?query={query}&count=0"
         scopus_res = requests.get(scopus_url, headers=ElsevierService.headers)
         if scopus_res.status_code != 200:
             raise ValueError(f'Error fetching total count from Elsevier (Scopus: {scopus_res.status_code})')

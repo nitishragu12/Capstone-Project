@@ -119,10 +119,6 @@ const SearchForm: React.FC = () => {
     }
   
     try {
-      // Fetch paper results
-      const response = await searchPapers(params.toString());
-      sessionStorage.setItem("papersData", JSON.stringify(response.data));
-      
       // Fetch total count
       const countResponse = await getTotalCount(params.toString());
       setResultCount(countResponse.data.total_count);

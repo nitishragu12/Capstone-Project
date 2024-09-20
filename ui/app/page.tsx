@@ -4,7 +4,6 @@ import HomePage from './home/page'; //Make sure the path is correct
 import Search from './search/page';
 import Results from './results/page';
 import style from './page.module.css';
-import Description from './description/page';
 
 export default function Page() {
   const [showResults, setShowResults] = useState(false); // Status to manage whether to display results
@@ -27,7 +26,10 @@ export default function Page() {
         <HomePage />
       </div>
 
+<<<<<<< HEAD
       {/* Display Search page*/}
+=======
+>>>>>>> 5f06bf4 (Added home page description and Footer)
       <div className={style['search-container']}>
         <Search onProceedClick={handleProceedClick} /> {/* Pass a function that handles the click*/}
       </div>

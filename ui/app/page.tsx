@@ -4,6 +4,7 @@ import HomePage from './home/page'; //Make sure the path is correct
 import Search from './search/page';
 import Results from './results/page';
 import style from './page.module.css';
+import Description from './description/page';
 
 export default function Page() {
   const [showResults, setShowResults] = useState(false); // Status to manage whether to display results

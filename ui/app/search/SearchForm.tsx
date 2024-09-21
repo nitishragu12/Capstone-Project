@@ -130,13 +130,6 @@ const SearchForm: React.FC<SearchFormProps> = ({ onProceedClick }) => {
   const buildQuery = (): string => {
     const params = new URLSearchParams();
     params.append("query", formData.query);
-<<<<<<< HEAD
-    
-=======
-    if (formData.publicationFile) {
-      
-    }
->>>>>>> 24c7021 (Removing the publication related task)
     if (formData.advanced) {
       params.append("fromDate", formData.fromDate);
       params.append("toDate", formData.toDate);

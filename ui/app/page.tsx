@@ -25,11 +25,7 @@ export default function Page() {
       <div className={style['home-container']}>
         <HomePage />
       </div>
-
-<<<<<<< HEAD
       {/* Display Search page*/}
-=======
->>>>>>> 5f06bf4 (Added home page description and Footer)
       <div className={style['search-container']}>
         <Search onProceedClick={handleProceedClick} /> {/* Pass a function that handles the click*/}
       </div>

@@ -93,10 +93,6 @@ const SearchForm: React.FC<SearchFormProps> = ({ onProceedClick }) => {
       setError("Query field contains invalid special characters.");
       return false;
     }
-    if (!formData.publicationFile) {
-      setError("Please upload a CSV file for publication.");
-      return false;
-    }
     
     if (formData.advanced) {
       if (!isValidMonthYear(formData.fromDate) || !isValidMonthYear(formData.toDate)) {

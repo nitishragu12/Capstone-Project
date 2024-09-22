@@ -41,6 +41,8 @@ function InputContainer({ inputValue, onChange, onSubmit }: { inputValue: string
         padding: 2,
         display: 'flex',
         gap: 2,
+        width: '100%',
+        maxWidth: '600px'
       }}
     >
       <TextField placeholder="Add Instruction"
@@ -69,6 +71,8 @@ function InputContainer({ inputValue, onChange, onSubmit }: { inputValue: string
         sx={{
           overflow: 'auto',
           resize: 'none',
+          width: '100%',
+          maxWidth: '600px'
         }}
       />
     </Box>
@@ -138,6 +142,8 @@ export default function InstructionBox() {
     <Paper
       style={{
         width: '100%',
+        maxWidth: '600px',
+        minWidth: '300px',
         height: '100%',
         padding: '5px',
         paddingTop: '5px',
@@ -153,6 +159,7 @@ export default function InstructionBox() {
         disableColumnSelector={true}
         hideFooter
         onRowClick={handleRowClick}
+        sx={{ width: '100%' }}
       />
       <InputContainer
         inputValue={inputValue}

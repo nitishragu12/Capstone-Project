@@ -26,19 +26,6 @@ paper_model = api.model('Paper', {
     'mutation': fields.String(description='Mutated json data of the paper')
 })
 
-@api.route('/select_model', methods=['POST'])
-class SelectModel(Resource):
-    def post(self):
-        '''Allow the user to select the LLM model (gemini-1.5-flash or gemini-1.5-pro)'''
-        selected_model = request.json.get('model', None)
-        if selected_model not in ['gemini-1.5-flash', 'gemini-1.5-pro']:
-            abort(400, 'Invalid model selected')
-        
-        # Save the selected model name into the session
-        session['llm_model_name'] = selected_model
-        app.logger.info(f'Model selected: {selected_model}')
-        return {'message': f'Model {selected_model} selected'}, 200
-
 @api.route('/')
 class PaperList(Resource):
     @api.marshal_list_with(paper_model)
@@ -75,9 +62,11 @@ class MutateFromChat(Resource):
         '''
         chat_id = request.json.get('chat_id', None)
         query = request.json.get('query', None)
+        model_name = "gemini-1.5-pro" if request.json.get('model', False) else None
+        GeminiService.load_model(model_name)
         if not query:
             abort(400, 'Instruction is required.')
-        app.logger.info(f'Chat ID: {chat_id}, Query: {query}')
+        app.logger.info(f'Chat ID: {chat_id}, Query: {query}, Model: {model_name}')
 
         batch_size = app.config.get('BATCH_SIZE', 5)
         total_count = Paper.query.count()
@@ -140,7 +129,8 @@ class PaperSearch(Resource):
         keyword = request.args.get('keyword', None)
         from_date = request.args.get('fromDate', None)
         to_date = request.args.get('toDate', None)
-        
+        model_name = "gemini-1.5-pro" if request.json.get('model', False) else None
+
         # Build query
         query_params = {
             'query': query,
@@ -150,12 +140,18 @@ class PaperSearch(Resource):
             'fromDate': from_date,
             'toDate': to_date
         }
+
         batch_size = app.config.get('BATCH_SIZE', 5)
         papers_rated = []
+
         total_count = ElsevierService.get_total_count(query_params)
         if total_count == 0:
             abort(404, 'No papers found.')
+
         app.logger.info(f'Seaching papers with query: {query_params}')
+
+        GeminiService.load_model(model_name)
+
         # Batch process papers
         for i in range(0, total_count, batch_size):
             # Set index for pagination

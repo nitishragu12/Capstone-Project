@@ -1,4 +1,3 @@
-// searchform.tsx
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -14,7 +13,6 @@ import { searchPapers, getTotalCount } from "../actions";
 import { useData } from "../context/DataContext";
 import { useError } from "../context/ErrorContext";
 import Progress from "../components/Progress";
-import BottomBar from "../components/Bottom-Bar"; // Correct import for BottomBar
 
 // Helper function to calculate the date 6 months ago
 const getSixMonthsAgo = (): string => {
@@ -44,10 +42,11 @@ const SearchForm: React.FC = () => {
   const router = useRouter();
 
   /* States declaration */
+
   const [formData, setFormData] = useState<SearchFormData>({
     query: "",
-    fromDate: getSixMonthsAgo(), // Default from 6 months ago
-    toDate: getCurrentMonth(), // Default to current month
+    fromDate: getSixMonthsAgo(),  // Default from 6 months ago
+    toDate: getCurrentMonth(),    // Default to current month
     title: "",
     author: "",
     publicationFile: null,
@@ -90,10 +89,7 @@ const SearchForm: React.FC = () => {
     }
     
     if (formData.advanced) {
-      if (
-        !isValidMonthYear(formData.fromDate) ||
-        !isValidMonthYear(formData.toDate)
-      ) {
+      if (!isValidMonthYear(formData.fromDate) || !isValidMonthYear(formData.toDate)) {
         setError("Please enter valid months and years in the format yyyy-mm.");
         return false;
       }
@@ -124,6 +120,7 @@ const SearchForm: React.FC = () => {
   const buildQuery = (): string => {
     const params = new URLSearchParams();
     params.append("query", formData.query);
+    params.append("model", formData.geminiPro);
     if (formData.advanced) {
       params.append("fromDate", formData.fromDate);
       params.append("toDate", formData.toDate);
@@ -131,37 +128,43 @@ const SearchForm: React.FC = () => {
       params.append("author", formData.author);
     }
     return params.toString();
-  };
+  }
 
   const handleSearch = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-
+  
     if (!isValidData()) return;
     setError("");
-
-    // Set loading state
+  
+    // Put loading mask on
     setLoading(true);
-
+  
+    // Construct query
     const query = buildQuery();
-    try {
-      const response = await getTotalCount(query);
-      setResultCount(response.data.total_count);
-    } catch (error) {
-      console.error("Error:", error);
-      setError("An error occurred while searching.");
-      setResultCount(0);
-    } finally {
-      setLoading(false);
-    }
+    // Get search total count
+    getTotalCount(query)
+      .then((response) => {
+        setResultCount(response.data.total_count);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        setError("An error occurred while searching.");
+        setResultCount(0);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const handleProceedSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (!isValidData()) return;
     setError(null);
+  
+    // Put loading mask on
+    setLoading(true);
 
-    setLoading(true); // Show loading indicator
-
+    // Construct query
     const query = buildQuery();
     // Reset data and chatId when proceeding
     setData(null);
@@ -351,8 +354,6 @@ const SearchForm: React.FC = () => {
           </form>
         </Paper>
       )}
-      {/* Pass the loading state to the BottomBar */}
-      <BottomBar loading={loading} />
     </>
   );
 };

@@ -8,15 +8,21 @@ import google.generativeai as genai
 
 class GeminiService:
     model = None
+    model_name = None
 
     @classmethod
-    def load_model(cls):
+    def load_model(cls, name: str=None):
         """Load the LLM model if not already loaded."""
-        if cls.model is None:
+        if not name:
+            name = app.config.get("LLM_MODEL_NAME", "gemini-1.5-flash")
+            raise ValueError('Missing model name for LLM')
+        
+        if cls.model is None or cls.model_name != name:
             key = app.config.get('LLM_API_KEY')
-            name = session.get('llm_model_name', app.config.get('LLM_MODEL_NAME', 'gemini-1.5-flash'))
-            if not key or not name:
+            if not key:
                 raise ValueError('Missing API key or model name for LLM')
+            
+            app.logger.info(f"The model being loaded is {name}")
             
             genai.configure(api_key=key)
             system_instruction = '''
@@ -33,6 +39,7 @@ class GeminiService:
                 system_instruction=system_instruction,
                 generation_config={'response_mime_type': 'application/json'}
             )
+            cls.model_name = name
     
     def create_prompt(self, papers, query):
         """Create a structured prompt from the papers and query."""
@@ -62,6 +69,7 @@ class GeminiService:
         Raises:
             ValueError: If no query or invalid response from Gemini.
         """
+        
         GeminiService.load_model()
 
         if not query:
@@ -101,7 +109,7 @@ class GeminiService:
         Raises:
             ValueError: If no query or invalid response from Gemini.
         """
-        GeminiService.load_model()
+
         if not query:
             raise ValueError('Missing query to interact with Gemini', 400)
         

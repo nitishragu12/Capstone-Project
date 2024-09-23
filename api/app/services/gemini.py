@@ -98,7 +98,6 @@ class GeminiService:
             db.session.commit()
             return papers
         except json.JSONDecodeError:
-            print(response.text)
             raise ValueError('Invalid response from Gemini', 500)
     
     def mutate_papers(self, papers, query, chat_id=None, model_name=None):

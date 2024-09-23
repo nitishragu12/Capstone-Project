@@ -42,7 +42,7 @@ const SearchForm: React.FC = () => {
   const router = useRouter();
 
   /* States declaration */
-
+  const [geminiPro, setGeminiPro] = useState<boolean>(false);
   const [formData, setFormData] = useState<SearchFormData>({
     query: "",
     fromDate: getSixMonthsAgo(),  // Default from 6 months ago
@@ -52,9 +52,8 @@ const SearchForm: React.FC = () => {
     publicationFile: null,
     advanced: true,
     chat: false,
-    geminiPro: false,
+    geminiPro: geminiPro,
   });
-
   const [resultCount, setResultCount] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { setError } = useError(null);
@@ -64,6 +63,11 @@ const SearchForm: React.FC = () => {
   useEffect(() => {
     sessionStorage.clear();
   }, []);
+
+  useEffect(() => {
+    setGeminiPro(formData.geminiPro);
+    sessionStorage.setItem("switchModel", formData.geminiPro);
+  }, [formData.geminiPro]);
 
   const isValidMonthYear = (dateString: string): boolean => {
     const regex = /^\d{4}-\d{2}$/;
@@ -120,7 +124,8 @@ const SearchForm: React.FC = () => {
   const buildQuery = (): string => {
     const params = new URLSearchParams();
     params.append("query", formData.query);
-    params.append("model", formData.geminiPro);
+    params.append("model", geminiPro);
+    sessionStorage.setItem("switchModel", geminiPro);
     if (formData.advanced) {
       params.append("fromDate", formData.fromDate);
       params.append("toDate", formData.toDate);
@@ -147,7 +152,6 @@ const SearchForm: React.FC = () => {
         setResultCount(response.data.total_count);
       })
       .catch((error) => {
-        console.error("Error:", error);
         setError("An error occurred while searching.");
         setResultCount(0);
       })

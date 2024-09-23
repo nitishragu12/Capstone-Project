@@ -42,8 +42,8 @@ class MutateFromChat(Resource):
         '''
         chat_id = request.json.get('chat_id', None)
         query = request.json.get('query', None)
-        print(request.json.get('model', False))
-        if request.json.get('model', False):
+        switch_model = request.json.get('model') == 'true'
+        if switch_model:
             model_name = app.config.get('LLM_MODEL_NAMES').split(',')[1]
         else:
             model_name = app.config.get('LLM_MODEL_NAMES').split(',')[0]
@@ -87,12 +87,11 @@ class PaperSearch(Resource):
         keyword = request.args.get('keyword', None)
         from_date = request.args.get('fromDate', None)
         to_date = request.args.get('toDate', None)
-        print(request.args.get('model', False))
-        if request.args.get('model', False):
+        switch_model = request.args.get('model') == 'true'
+        if switch_model:
             model_name = app.config.get('LLM_MODEL_NAMES').split(',')[1]
         else:
             model_name = app.config.get('LLM_MODEL_NAMES').split(',')[0]
-
         # Build query
         query_params = {
             'query': query,

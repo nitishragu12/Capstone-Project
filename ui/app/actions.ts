@@ -42,10 +42,11 @@ export const getTotalCount = async (query: String): Promise<any> => {
  * Get the total count of papers.
  * @returns The response from the API.
  */
-export const giveInstruction = async (instruction: String, model: String): Promise<any> => {
+export const giveInstruction = async (instruction: String): Promise<any> => {
   const apiUrl = `${baseApiUrl}/papers/mutate_from_chat`;
   const chatId = sessionStorage.getItem('chatId');
-  const data = chatId ? { 'query': instruction, 'chat_id': chatId, 'model': model } : { 'query': instruction, 'model': model };
+  const switchModel = sessionStorage.getItem('switchModel') || false;
+  const data = chatId ? { 'query': instruction, 'chat_id': chatId, 'model': switchModel } : { 'query': instruction, 'model': switchModel };
   const response = await axios.post(apiUrl, data, { headers });
   if (!chatId) {
     sessionStorage.setItem('chatId', response.data['chat']);

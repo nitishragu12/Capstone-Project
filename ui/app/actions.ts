@@ -2,8 +2,7 @@ import axios from "axios";
 
 const baseApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const headers = {
-  'Content-Type': 'application/json',
-  'Accept': 'application/json'
+  'Content-Type': 'application/json'
 };
 
 /**
@@ -13,7 +12,7 @@ const headers = {
  */
 export const searchPapers = async (query: string): Promise<any> => {
   const apiUrl = `${baseApiUrl}/papers/search?${query}`;
-  const response = await axios.get(apiUrl, { headers });
+  const response = await axios.get(apiUrl);
   if (!sessionStorage.getItem('query'))
     sessionStorage.setItem('query', query);
   return response;

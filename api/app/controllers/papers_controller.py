@@ -129,7 +129,7 @@ class PaperSearch(Resource):
         keyword = request.args.get('keyword', None)
         from_date = request.args.get('fromDate', None)
         to_date = request.args.get('toDate', None)
-        model_name = "gemini-1.5-pro" if request.json.get('model', False) else None
+        model_name = "gemini-1.5-pro" if request.args.get('model', False) else None
 
         # Build query
         query_params = {

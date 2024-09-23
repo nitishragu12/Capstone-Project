@@ -7,7 +7,7 @@ class Config:
 
     SECRET_KEY = os.environ.get('SECRET_KEY') # for session management
     
-    LLM_MODEL_NAME = 'gemini-1.5-flash' # # The default model is gemini-1.5-flash, and users can override it through the UI to gemini-1.5-pro
+    LLM_MODEL_NAMES = 'gemini-1.5-flash,gemini-1.5-pro'
 
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
 

@@ -210,148 +210,146 @@ const SearchForm: React.FC = () => {
         <Progress eventName="search-progress" />
       ) : (
         <Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
-          <form>
-            <Grid container spacing={2}>
-              <Grid
-                xs={12}
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.advanced}
-                      onChange={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          advanced: !prev.advanced,
-                        }))
-                      }
-                    />
-                  }
-                  label="Advanced Search"
-                  sx={{ marginRight: 2 }}
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.geminiPro}
-                      onChange={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          geminiPro: !prev.geminiPro,
-                        }))
-                      }
-                    />
-                  }
-                  label="Gemini 1.5 Pro"
-                />
-              </Grid>
-
-              <Grid xs={6}>
-                <TextField
-                  label="Query"
-                  fullWidth
-                  value={formData.query}
-                  onChange={handleInputChange("query")}
-                />
-              </Grid>
-
-              {/* File upload field */}
-              <Grid xs={6}>
-                <TextField
-                  type="file"
-                  inputProps={{ accept: ".csv" }} 
-                  fullWidth
-                  onChange={handleFileChange}
-                  helperText={
-                    formData.publicationFile
-                      ? `Selected file: ${formData.publicationFile.name}`
-                      : "Choose your file to filter publications"
-                  }
-                />
-              </Grid>
-
-              {formData.advanced && (
-                <>
-                  <Grid xs={6}>
-                    <TextField
-                      label="From Date (yyyy-mm)"
-                      type="month"  // Changed input type to "month"
-                      fullWidth
-                      value={formData.fromDate}
-                      onChange={handleInputChange("fromDate")}
-                    />
-                  </Grid>
-                  <Grid xs={6}>
-                    <TextField
-                      label="To Date (yyyy-mm)"
-                      type="month"  // Changed input type to "month"
-                      fullWidth
-                      value={formData.toDate}
-                      onChange={handleInputChange("toDate")}
-                    />
-                  </Grid>
-                  <Grid xs={6}>
-                    <TextField
-                      label="Title"
-                      fullWidth
-                      value={formData.title}
-                      onChange={handleInputChange("title")}
-                    />
-                  </Grid>
-                  <Grid xs={6}>
-                    <TextField
-                      label="Author"
-                      fullWidth
-                      value={formData.author}
-                      onChange={handleInputChange("author")}
-                    />
-                  </Grid>
-                </>
-              )}
-              
-              {resultCount !== null && (
-                <Grid 
-                xs={12}
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  marginTop: 2
-                }}
-                >
-                  <Paper elevation={1} 
-                  sx={{
-                    backgroundColor: "#f6f6f6",
-                    padding: 2,
-                    display: "flex",
-                    alignItems: "center"
-                  }}
-                  >
-                    <span style={{ marginRight: 5 }}>🔍</span>
-                    <span>Total Results: {resultCount}</span>
-                  </Paper>
-                </Grid>
-              )}
-
-              <Grid xs={12} sx={{ display: "flex", justifyContent: "center" }}>
-                <Button type="submit" variant="contained" color="primary" onClick={handleSearch}>
-                  Search
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  sx={{ marginLeft: 2 }}
-                  onClick={handleProceedSubmit}
-                >
-                  Proceed
-                </Button>
-              </Grid>
+          <Grid container spacing={2}>
+            <Grid
+              xs={12}
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.advanced}
+                    onChange={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        advanced: !prev.advanced,
+                      }))
+                    }
+                  />
+                }
+                label="Advanced Search"
+                sx={{ marginRight: 2 }}
+              />
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.geminiPro}
+                    onChange={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        geminiPro: !prev.geminiPro,
+                      }))
+                    }
+                  />
+                }
+                label="Gemini 1.5 Pro"
+              />
             </Grid>
-          </form>
+
+            <Grid xs={6}>
+              <TextField
+                label="Query"
+                fullWidth
+                value={formData.query}
+                onChange={handleInputChange("query")}
+              />
+            </Grid>
+
+            {/* File upload field */}
+            <Grid xs={6}>
+              <TextField
+                type="file"
+                inputProps={{ accept: ".csv" }} 
+                fullWidth
+                onChange={handleFileChange}
+                helperText={
+                  formData.publicationFile
+                    ? `Selected file: ${formData.publicationFile.name}`
+                    : "Choose your file to filter publications"
+                }
+              />
+            </Grid>
+
+            {formData.advanced && (
+              <>
+                <Grid xs={6}>
+                  <TextField
+                    label="From Date (yyyy-mm)"
+                    type="month"  // Changed input type to "month"
+                    fullWidth
+                    value={formData.fromDate}
+                    onChange={handleInputChange("fromDate")}
+                  />
+                </Grid>
+                <Grid xs={6}>
+                  <TextField
+                    label="To Date (yyyy-mm)"
+                    type="month"  // Changed input type to "month"
+                    fullWidth
+                    value={formData.toDate}
+                    onChange={handleInputChange("toDate")}
+                  />
+                </Grid>
+                <Grid xs={6}>
+                  <TextField
+                    label="Title"
+                    fullWidth
+                    value={formData.title}
+                    onChange={handleInputChange("title")}
+                  />
+                </Grid>
+                <Grid xs={6}>
+                  <TextField
+                    label="Author"
+                    fullWidth
+                    value={formData.author}
+                    onChange={handleInputChange("author")}
+                  />
+                </Grid>
+              </>
+            )}
+            
+            {resultCount !== null && (
+              <Grid 
+              xs={12}
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 2
+              }}
+              >
+                <Paper elevation={1} 
+                sx={{
+                  backgroundColor: "#f6f6f6",
+                  padding: 2,
+                  display: "flex",
+                  alignItems: "center"
+                }}
+                >
+                  <span style={{ marginRight: 5 }}>🔍</span>
+                  <span>Total Results: {resultCount}</span>
+                </Paper>
+              </Grid>
+            )}
+
+            <Grid xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+              <Button type="submit" variant="contained" color="primary" onClick={handleSearch}>
+                Search
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                sx={{ marginLeft: 2 }}
+                onClick={handleProceedSubmit}
+              >
+                Proceed
+              </Button>
+            </Grid>
+          </Grid>
         </Paper>
       )}
     </>

@@ -9,22 +9,27 @@ import google.generativeai as genai
 class GeminiService:
     model = None
     model_name = None
+    api_key = None
 
     @classmethod
-    def load_model(cls, name: str=None):
+    def load_model(cls, name:str=None):
         """Load the LLM model if not already loaded."""
-        if not name:
-            name = app.config.get("LLM_MODEL_NAME", "gemini-1.5-flash")
-            raise ValueError('Missing model name for LLM')
-        
-        if cls.model is None or cls.model_name != name:
-            key = app.config.get('LLM_API_KEY')
-            if not key:
-                raise ValueError('Missing API key or model name for LLM')
-            
-            app.logger.info(f"The model being loaded is {name}")
-            
-            genai.configure(api_key=key)
+        if not cls.api_key:
+            # Load the API key once from the config
+            cls.api_key = app.config.get('LLM_API_KEY')
+            if not cls.api_key:
+                raise ValueError('Missing API key for LLM')
+
+        if name:
+            # If a name is provided, use it, otherwise default to config value
+            model_name = name
+        else:
+            model_name = app.config.get("LLM_MODEL_NAMES", "gemini-1.5-flash").split(',')[0]
+
+        if cls.model is None or (name and cls.model_name != name):
+            app.logger.info(f'Swithcing model: {model_name}')
+            # Only load a new model if the model name has changed
+            genai.configure(api_key=cls.api_key)
             system_instruction = '''
                 1. This is a system for automating search, scanning, and analysis for literature.
                 2. Researchers are the main users.
@@ -35,11 +40,11 @@ class GeminiService:
                 6. If user query is to rate, follow column naming e.g. rate based on keyword = `relevance_keyword`.
             '''
             cls.model = genai.GenerativeModel(
-                name,
+                model_name,
                 system_instruction=system_instruction,
                 generation_config={'response_mime_type': 'application/json'}
             )
-            cls.model_name = name
+            cls.model_name = model_name
     
     def create_prompt(self, papers, query):
         """Create a structured prompt from the papers and query."""
@@ -55,7 +60,7 @@ class GeminiService:
         '''
         return prompt
     
-    def analyse_papers(self, papers: list, query):
+    def analyse_papers(self, papers: list, query, model_name=None):
         """
         Generate relevance and synopsis for papers based on a query.
 
@@ -70,7 +75,7 @@ class GeminiService:
             ValueError: If no query or invalid response from Gemini.
         """
         
-        GeminiService.load_model()
+        GeminiService.load_model(model_name)
 
         if not query:
             raise ValueError('Missing query for rating papers.', 400)
@@ -88,14 +93,15 @@ class GeminiService:
                 for key, value in analysis.items():
                     if key.startswith('relevance_'):
                         paper.relevance = value
-                    elif key == 'synopsis':
+                    elif key.startswith('synopsis'):
                         paper.synopsis = value
             db.session.commit()
             return papers
         except json.JSONDecodeError:
+            print(response.text)
             raise ValueError('Invalid response from Gemini', 500)
     
-    def mutate_papers(self, papers, query, chat_id=None):
+    def mutate_papers(self, papers, query, chat_id=None, model_name=None):
         """
         Mutate papers based on a query.
 
@@ -109,6 +115,7 @@ class GeminiService:
         Raises:
             ValueError: If no query or invalid response from Gemini.
         """
+        GeminiService.load_model(model_name)
 
         if not query:
             raise ValueError('Missing query to interact with Gemini', 400)

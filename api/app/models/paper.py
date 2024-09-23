@@ -42,7 +42,6 @@ class Paper(db.Model):
             if key == 'publish_date':
                 item[key] = value.strftime('%Y-%m-%d')
             elif key == 'mutation' and value:
-                print(value)
                 item.update(json.loads(value))
             else:
                 item[key] = value

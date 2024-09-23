@@ -34,26 +34,6 @@ class PaperList(Resource):
         papers = ElsevierService.fetch_papers({'query': app.config['DEFAULT_QUERY']})
         return papers, 200
 
-@api.route('/rate/<string:query>')
-class Rate(Resource):
-    @api.marshal_list_with(paper_model, code=200)
-    @api.doc(params={'query': 'The criteria to rate papers.'})
-    def put(self, query):
-        '''Rate papers based on relevance to a query'''
-        ElsevierService.fetch_papers({'query': query})
-        papers = gemini.analyse_papers(query)
-        return papers
-    
-@api.route('/mutate/<string:query>')
-class Mutate(Resource):
-    @api.marshal_list_with(paper_model, code=200)
-    @api.doc(params={'query': 'The criteria to mutate papers.'})
-    def put(self, query):
-        '''Mutate papers based on a query'''
-        papers = gemini.mutate_papers(query) # Result should contain only doi and mutation
-        ElsevierService.update_papers(papers)
-        return papers, 200
-
 @api.route('/mutate_from_chat')
 class MutateFromChat(Resource):
     def post(self):
@@ -62,8 +42,11 @@ class MutateFromChat(Resource):
         '''
         chat_id = request.json.get('chat_id', None)
         query = request.json.get('query', None)
-        model_name = "gemini-1.5-pro" if request.json.get('model', False) else None
-        GeminiService.load_model(model_name)
+        print(request.json.get('model', False))
+        if request.json.get('model', False):
+            model_name = app.config.get('LLM_MODEL_NAMES').split(',')[1]
+        else:
+            model_name = app.config.get('LLM_MODEL_NAMES').split(',')[0]
         if not query:
             abort(400, 'Instruction is required.')
         app.logger.info(f'Chat ID: {chat_id}, Query: {query}, Model: {model_name}')
@@ -75,7 +58,7 @@ class MutateFromChat(Resource):
         # Batch process papers
         for i in range(0, total_count, batch_size):
             batch_papers = Paper.query.limit(batch_size).offset(i).all()
-            batch_result, chat_id = gemini.mutate_papers(batch_papers, query, chat_id)
+            batch_result, chat_id = gemini.mutate_papers(batch_papers, query, chat_id, model_name=model_name)
             # Update mutation column in the database
             ElsevierService.update_papers(batch_result)
             doi_list = [doi for doi in batch_result]
@@ -90,31 +73,6 @@ class MutateFromChat(Resource):
             'chat': chat_id
         }
         return response, 200
-
-@api.route('/export')
-class Export(Resource):
-    def post(self):
-        '''Export relevant papers to CSV'''
-        # Get top 5 papers sorted by relevance
-        papers = Paper.query.all()
-        
-        if not papers:
-            return "No paper to export.", 404
-        
-        papers_dict = [paper.mutation_dict() for paper in papers]
-
-        # Create DataFrame
-        df = pd.DataFrame(papers_dict)
-
-        # Convert DataFrame to CSV
-        csv_data = df.to_csv(index=False)
-
-        # Create a response object and set the headers for downloading
-        response = make_response(csv_data)
-        response.headers['Content-Disposition'] = 'attachment; filename=top_20_papers.csv'
-        response.headers['Content-Type'] = 'text/csv'
-        return response
-
     
 @api.route('/search')
 class PaperSearch(Resource):
@@ -129,7 +87,11 @@ class PaperSearch(Resource):
         keyword = request.args.get('keyword', None)
         from_date = request.args.get('fromDate', None)
         to_date = request.args.get('toDate', None)
-        model_name = "gemini-1.5-pro" if request.args.get('model', False) else None
+        print(request.args.get('model', False))
+        if request.args.get('model', False):
+            model_name = app.config.get('LLM_MODEL_NAMES').split(',')[1]
+        else:
+            model_name = app.config.get('LLM_MODEL_NAMES').split(',')[0]
 
         # Build query
         query_params = {
@@ -150,8 +112,6 @@ class PaperSearch(Resource):
 
         app.logger.info(f'Seaching papers with query: {query_params}')
 
-        GeminiService.load_model(model_name)
-
         # Batch process papers
         for i in range(0, total_count, batch_size):
             # Set index for pagination
@@ -159,7 +119,7 @@ class PaperSearch(Resource):
             # Fetch papers from Elsevier API. Delete existing papers for the first batch.
             batch_papers = ElsevierService.fetch_papers(query_params, delete_existing=i == 0)
             # Analyse papers using Gemini
-            batch_result = gemini.analyse_papers(batch_papers, query)
+            batch_result = gemini.analyse_papers(batch_papers, query, model_name=model_name)
             papers_rated.extend(batch_result)
             # Emit progress to the client
             progress = int((i + batch_size) / total_count * 100)
@@ -180,7 +140,6 @@ class ChatHistory(Resource):
         '''Get chat history'''
         chat_id = request.args.get('chat_id', None)
         chat_list = []
-        print(chat_id)
         if not chat_id:
             return chat_list, 200
         main_chat = Chat.query.get(chat_id)

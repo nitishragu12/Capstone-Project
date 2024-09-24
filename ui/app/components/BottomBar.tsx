@@ -1,16 +1,14 @@
 // bottom-bar.tsx
 import React from 'react';
 import Link from 'next/link';
-import '../Bottom-Bar.css'; // Import the CSS file
+import '../bottom-bar.css'; // Import the CSS file
 import { useData } from '../context/DataContext';
-import { CircularProgress, Typography, Box } from '@mui/material'; // Import necessary components
+import { useLoading } from '../context/LoadingContext';
+import Progress from './Progress';
 
-interface BottomBarProps {
-  loading: boolean;
-}
-
-const BottomBar: React.FC<BottomBarProps> = ({ loading }) => {
+const BottomBar: React.FC = () => {
   const { data } = useData();
+  const { loading, loadEvent } = useLoading();
   const resultsEnabled = data !== null;
 
   const handleScroll = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, targetId: string) => {
@@ -25,12 +23,7 @@ const BottomBar: React.FC<BottomBarProps> = ({ loading }) => {
     <div className="bottom-bar">
       {/* Conditionally display loading indicator or traffic light */}
       {loading ? (
-        <div className="loading-container">
-          <CircularProgress size={20} color="inherit" />
-          <Typography variant="body2" sx={{ marginLeft: 1 }}>
-            Loading...
-          </Typography>
-        </div>
+        <Progress eventName={loadEvent} />
       ) : (
         <div className="traffic-light">
           <div className="light red"></div>

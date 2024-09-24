@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { DataProvider } from "./context/DataContext";
 import { ErrorProvider } from "./context/ErrorContext";
+import { LoadingProvider } from "./context/LoadingContext";
 // import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -20,9 +21,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ErrorProvider>
-          <DataProvider>
-            {children}
-          </DataProvider>
+          <LoadingProvider>
+            <DataProvider>
+              {children}
+            </DataProvider>
+          </LoadingProvider>
         </ErrorProvider>
       </body>
     </html>

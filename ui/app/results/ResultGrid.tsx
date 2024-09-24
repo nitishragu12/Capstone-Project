@@ -8,7 +8,6 @@ import { useLoading } from '../context/LoadingContext';
 import { useRouter } from 'next/navigation';
 import { searchPapers } from '../actions';
 import PaperDetail from './PaperDetail';
-import Progress from '../components/Progress';
 
 // Function to truncate text
 const truncateText = (text: string, length: number) => {

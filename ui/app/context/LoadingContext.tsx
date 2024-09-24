@@ -1,9 +1,11 @@
+'use client'
 import React, { createContext, useState, useContext, ReactNode } from "react";
 
 // Define context type
 type LoadingContextType = {
   loading: boolean;
-  setLoading: (state: boolean) => void;
+  loadEvent: string; // Add loadEvent to the context type
+  setLoading: (state: boolean, event?: string) => void;
 };
 
 // Create the context
@@ -11,10 +13,17 @@ const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 
 // Provider component
 export const LoadingProvider = ({ children }: { children: ReactNode }) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoadingState] = useState(false);
+  const [loadEvent, setLoadEvent] = useState("");
+
+  // Updated setLoading to handle both loading state and loadEvent
+  const setLoading = (state: boolean, event: string = "") => {
+    setLoadingState(state);
+    setLoadEvent(event); // Update loadEvent
+  };
 
   return (
-    <LoadingContext.Provider value={{ loading, setLoading }}>
+    <LoadingContext.Provider value={{ loading, loadEvent, setLoading }}>
       {children}
     </LoadingContext.Provider>
   );

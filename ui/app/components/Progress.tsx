@@ -13,10 +13,10 @@ const Overlay = styled('div')(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   height: '100%',
-  backgroundColor: 'rgba(18, 18, 18, 0.9)',
-  ...theme.applyStyles('light', {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-  }),
+  // backgroundColor: 'rgba(18, 18, 18, 0.9)',
+  // ...theme.applyStyles('light', {
+  //   backgroundColor: 'rgba(255, 255, 255, 0.9)',
+  // }),
 }));
 
 function CircularProgressWithLabel(
@@ -24,7 +24,7 @@ function CircularProgressWithLabel(
 ) {
   return (
     <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-      <CircularProgress size={"3rem"} />
+      <CircularProgress />
       <Box
         sx={{
           top: 0,
@@ -34,7 +34,7 @@ function CircularProgressWithLabel(
           position: 'absolute',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'center'
         }}
       >
         <Typography
@@ -60,7 +60,6 @@ export default function Progress({ eventName }: ProgressProps) {
       transports: ['websocket'],
     });
     const socket = socketRef.current;
-
     // Listen to the event passed as a prop
     socket.on(eventName, (data: any) => {
       setProgress(data.progress);

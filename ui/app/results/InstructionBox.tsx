@@ -104,7 +104,7 @@ export default function InstructionBox() {
 
   const handleSend = () => {
     if (inputValue.trim()) {
-      setLoading(true);
+      setLoading(true, "chat-progress");
       const timestamp = new Date().toLocaleString('en-AU', { timeZone: 'Australia/Perth' });
       setRows((prevRows) => {
         const newRows = prevRows ? [...prevRows] : [];

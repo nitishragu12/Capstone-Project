@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Grid from "@mui/material/Unstable_Grid2";
 import {
   Switch,
+  Skeleton,
   FormControlLabel,
   Paper,
   TextField,
@@ -12,8 +13,7 @@ import {
 import { searchPapers, getTotalCount } from "../actions";
 import { useData } from "../context/DataContext";
 import { useError } from "../context/ErrorContext";
-import Progress from "../components/Progress";
-import BottomBar from "../components/BottomBar"; // Correct import for BottomBar
+import { useLoading } from "../context/LoadingContext";
 
 // Helper function to calculate the date 6 months ago
 const getSixMonthsAgo = (): string => {
@@ -56,7 +56,7 @@ const SearchForm: React.FC = () => {
     geminiPro: geminiPro,
   });
   const [resultCount, setResultCount] = useState<number | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading } = useLoading();
   const { setError } = useError(null);
   const { data, setData } = useData();
 
@@ -165,11 +165,9 @@ const SearchForm: React.FC = () => {
     event.preventDefault();
     if (!isValidData()) return;
     setError(null);
-  
-    // Put loading mask on
-    setLoading(true);
+    
+    setLoading(true, "search-progress"); // Show loading indicator
 
-    // Construct query
     const query = buildQuery();
     // Reset data and chatId when proceeding
     setData(null);
@@ -211,19 +209,20 @@ const SearchForm: React.FC = () => {
   
   return (
     <>
-      {loading ? (
-        <Progress eventName="search-progress" />
-      ) : (
-        <Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
-          <Grid container spacing={2}>
-            <Grid
-              xs={12}
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
+      <Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
+        <Grid container spacing={2}>
+          <Grid
+            xs={12}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {/* Use Skeleton for FormControlLabel */}
+            {loading ? (
+              <Skeleton width={200} height={40} />
+            ) : (
               <FormControlLabel
                 control={
                   <Switch
@@ -239,6 +238,11 @@ const SearchForm: React.FC = () => {
                 label="Advanced Search"
                 sx={{ marginRight: 2 }}
               />
+            )}
+
+            {loading ? (
+              <Skeleton width={200} height={40} />
+            ) : (
               <FormControlLabel
                 control={
                   <Switch
@@ -253,22 +257,30 @@ const SearchForm: React.FC = () => {
                 }
                 label="Gemini 1.5 Pro"
               />
-            </Grid>
+            )}
+          </Grid>
 
-            <Grid xs={6}>
+          <Grid xs={6}>
+            {loading ? (
+              <Skeleton width="100%" height={56} />
+            ) : (
               <TextField
                 label="Query"
                 fullWidth
                 value={formData.query}
                 onChange={handleInputChange("query")}
               />
-            </Grid>
+            )}
+          </Grid>
 
-            {/* File upload field */}
-            <Grid xs={6}>
+          {/* File upload field */}
+          <Grid xs={6}>
+            {loading ? (
+              <Skeleton width="100%" height={56} />
+            ) : (
               <TextField
                 type="file"
-                inputProps={{ accept: ".csv" }} 
+                inputProps={{ accept: ".csv" }}
                 fullWidth
                 onChange={handleFileChange}
                 helperText={
@@ -277,74 +289,114 @@ const SearchForm: React.FC = () => {
                     : "Choose your file to filter publications"
                 }
               />
-            </Grid>
+            )}
+          </Grid>
 
-            {formData.advanced && (
-              <>
-                <Grid xs={6}>
+          {formData.advanced && (
+            <>
+              <Grid xs={6}>
+                {loading ? (
+                  <Skeleton width="100%" height={56} />
+                ) : (
                   <TextField
                     label="From Date (yyyy-mm)"
-                    type="month"  // Changed input type to "month"
+                    type="month"
                     fullWidth
                     value={formData.fromDate}
                     onChange={handleInputChange("fromDate")}
                   />
-                </Grid>
-                <Grid xs={6}>
+                )}
+              </Grid>
+
+              <Grid xs={6}>
+                {loading ? (
+                  <Skeleton width="100%" height={56} />
+                ) : (
                   <TextField
                     label="To Date (yyyy-mm)"
-                    type="month"  // Changed input type to "month"
+                    type="month"
                     fullWidth
                     value={formData.toDate}
                     onChange={handleInputChange("toDate")}
                   />
-                </Grid>
-                <Grid xs={6}>
+                )}
+              </Grid>
+
+              <Grid xs={6}>
+                {loading ? (
+                  <Skeleton width="100%" height={56} />
+                ) : (
                   <TextField
                     label="Title"
                     fullWidth
                     value={formData.title}
                     onChange={handleInputChange("title")}
                   />
-                </Grid>
-                <Grid xs={6}>
+                )}
+              </Grid>
+
+              <Grid xs={6}>
+                {loading ? (
+                  <Skeleton width="100%" height={56} />
+                ) : (
                   <TextField
                     label="Author"
                     fullWidth
                     value={formData.author}
                     onChange={handleInputChange("author")}
                   />
-                </Grid>
-              </>
-            )}
-            
-            {resultCount !== null && (
-              <Grid 
+                )}
+              </Grid>
+            </>
+          )}
+
+          {resultCount !== null && (
+            <Grid
               xs={12}
               sx={{
+                backgroundColor: "#f6f6f6",
+                padding: 2,
                 display: "flex",
                 justifyContent: "center",
-                marginTop: 2
+                marginTop: 2,
               }}
-              >
-                <Paper elevation={1} 
-                sx={{
-                  backgroundColor: "#f6f6f6",
-                  padding: 2,
-                  display: "flex",
-                  alignItems: "center"
-                }}
+            >
+              {loading ? (
+                <Skeleton width={300} height={50} />
+              ) : (
+                <Paper
+                  elevation={1}
+                  sx={{
+                    backgroundColor: "#f6f6f6",
+                    padding: 2,
+                    display: "flex",
+                    alignItems: "center",
+                  }}
                 >
                   <span style={{ marginRight: 5 }}>🔍</span>
                   <span>Total Results: {resultCount}</span>
                 </Paper>
-              </Grid>
-            )}
+              )}
+            </Grid>
+          )}
 
-            <Grid xs={12} sx={{ display: "flex", justifyContent: "center" }}>
-              <Button type="submit" variant="contained" color="primary" onClick={handleSearch}>
+          <Grid xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+            {loading ? (
+              <Skeleton width={150} height={50} />
+            ) : (
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                onClick={handleSearch}
+              >
                 Search
               </Button>
+            )}
+
+            {loading ? (
+              <Skeleton width={150} height={50} sx={{ marginLeft: 2 }} />
+            ) : (
               <Button
                 variant="contained"
                 color="secondary"
@@ -353,10 +405,10 @@ const SearchForm: React.FC = () => {
               >
                 Proceed
               </Button>
-            </Grid>
+            )}
           </Grid>
-        </Paper>
-      )}
+        </Grid>
+      </Paper>
     </>
   );
 };

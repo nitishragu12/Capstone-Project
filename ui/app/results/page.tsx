@@ -4,7 +4,6 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import style from '../page.module.css';
 import ResultGrid from './ResultGrid';
-import { LoadingProvider } from '../context/LoadingContext';
 
 
 export default function Results() {
@@ -13,9 +12,7 @@ export default function Results() {
       <div className={style.main}>
         <div className={style["papermate-container"]}>
           <Header />
-          <LoadingProvider>
-            <ResultGrid />
-          </LoadingProvider>
+          <ResultGrid />
           <Footer />
         </div>
       </div>

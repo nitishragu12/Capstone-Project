@@ -5,6 +5,7 @@ import Search from './search/page';
 import Results from './results/page';
 import style from './page.module.css';
 import { useData } from './context/DataContext';
+import BottomBar from './components/BottomBar';
 
 export default function Page() {
   const { data } = useData();
@@ -37,6 +38,7 @@ export default function Page() {
           <Results />
         </div>
       )}
+      <BottomBar />
     </div>
   );
 }

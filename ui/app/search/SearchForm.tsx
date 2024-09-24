@@ -13,6 +13,7 @@ import { searchPapers, getTotalCount } from "../actions";
 import { useData } from "../context/DataContext";
 import { useError } from "../context/ErrorContext";
 import Progress from "../components/Progress";
+import BottomBar from "../components/BottomBar"; // Correct import for BottomBar
 
 // Helper function to calculate the date 6 months ago
 const getSixMonthsAgo = (): string => {

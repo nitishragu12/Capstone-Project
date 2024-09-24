@@ -32,7 +32,7 @@ export default function Page() {
       </div>
 
       {/* Display the Results page according to the showResults status */}
-      {showResults && (
+      {data && (
         <div className={style['result-container']} ref={resultsRef} id={"results"}> {/* Make sure the class name is correct */}
           <Results />
         </div>

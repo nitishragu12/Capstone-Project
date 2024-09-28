@@ -74,7 +74,6 @@ const ResultGrid: React.FC<ResultGridProps> = ({ showInstruction }) => {
             getRowId={(row) => row.doi}
             disableRowSelectionOnClick
             disableColumnMenu={true}
-            disableColumnReorder={true}
             slots={{
               toolbar: GridToolbar
             }}

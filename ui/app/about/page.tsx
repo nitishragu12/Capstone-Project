@@ -34,7 +34,7 @@ const About = () => {
 
       <Grid container spacing={2} justifyContent="center">
         {groupMembers.map((member) => (
-          <Grid xs={6} md={4}>
+          <Grid key={member.id} xs={6} md={4}>
             <Card>
               <CardHeader
                 avatar={<img src={member.avatar} alt={member.name} style={{ borderRadius: "50%", width: 60, height: 60 }} />}

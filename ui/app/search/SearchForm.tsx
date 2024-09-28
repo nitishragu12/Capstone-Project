@@ -63,7 +63,7 @@ const SearchForm: React.FC = () => {
 
   useEffect(() => {
     setGeminiPro(formData.geminiPro);
-    sessionStorage.setItem("switchModel", formData.geminiPro);
+    sessionStorage.setItem("switchModel", String(formData.geminiPro));
   }, [formData.geminiPro]);
 
   const isValidMonthYear = (dateString: string): boolean => {
@@ -123,8 +123,8 @@ const SearchForm: React.FC = () => {
   const buildQuery = (): string => {
     const params = new URLSearchParams();
     params.append("query", formData.query);
-    params.append("model", geminiPro);
-    sessionStorage.setItem("switchModel", geminiPro);
+    params.append("model", String(geminiPro));
+    sessionStorage.setItem("switchModel", String(geminiPro));
     if (formData.advanced) {
       params.append("fromDate", formData.fromDate);
       params.append("toDate", formData.toDate);

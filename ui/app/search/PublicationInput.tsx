@@ -14,16 +14,20 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-export default function InputFileUpload() {
+export default function InputFileUpload({ onChange, className }: { 
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void; 
+  className?: string; 
+}) {
   return (
     <Button
       component="label"
       role={undefined}
       variant="contained"
       tabIndex={-1}
+      className={className}
     >
       Upload Publication CSV
-      <VisuallyHiddenInput type="file" accept=".csv" />
+      <VisuallyHiddenInput type="file" accept=".csv" onChange={onChange} />
     </Button>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import '../bottom-bar.css'; // Import the CSS file
+import '../Bottom-Bar.css'; // Import the CSS file
 import { useData } from '../context/DataContext';
 import { useLoading } from '../context/LoadingContext';
 import Progress from './Progress';

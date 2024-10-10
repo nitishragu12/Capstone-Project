@@ -1,0 +1,5 @@
+tests/*
+logs/*
+Dockerfile*
+README.md
+sample.json
